@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"backend/internal/model"
-	"backend/internal/service"
-	"backend/internal/worker"
+	"api/internal/model"
+	"api/internal/service"
+	"api/internal/worker"
 	"encoding/json"
 	"log/slog"
 	"net/http"

@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"backend/internal/worker"
+	"api/internal/worker"
 	"encoding/json"
 	"net/http"
 )

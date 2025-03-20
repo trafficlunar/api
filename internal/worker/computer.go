@@ -1,8 +1,8 @@
 package worker
 
 import (
-	"backend/internal/model"
-	"backend/internal/service"
+	"api/internal/model"
+	"api/internal/service"
 	"log/slog"
 	"time"
 )

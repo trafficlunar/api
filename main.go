@@ -7,8 +7,8 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/lmittmann/tint"
 
-	"backend/internal/server"
-	"backend/internal/worker"
+	"api/internal/server"
+	"api/internal/worker"
 )
 
 func main() {

@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"backend/internal/model"
+	"api/internal/model"
 )
 
 const path = "./data/hit.json"

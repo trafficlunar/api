@@ -1,7 +1,7 @@
 package service
 
 import (
-	"backend/internal/model"
+	"api/internal/model"
 	"encoding/json"
 	"fmt"
 	"io"

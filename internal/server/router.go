@@ -11,7 +11,7 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/go-chi/httprate"
 
-	"backend/internal/handler"
+	"api/internal/handler"
 )
 
 func getAllowedOrigins() []string {
