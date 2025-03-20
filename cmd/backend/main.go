@@ -17,7 +17,7 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		slog.Error("Error loading .env file", slog.Any("error", err))
+		slog.Warn("No .env file was found; using environment variables.", slog.Any("error", err))
 	}
 
 	go worker.StartWorkers()
