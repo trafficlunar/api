@@ -6,15 +6,15 @@ import (
 	"net/http"
 )
 
-func HandleGetVisitCounter(w http.ResponseWriter, r *http.Request) {
-	data := service.GetVisitCounter()
+func HandleGetHitCounter(w http.ResponseWriter, r *http.Request) {
+	data := service.GetHitCounter()
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(data)
 }
 
-func HandlePatchVisitCounter(w http.ResponseWriter, r *http.Request) {
-	data := service.IncrementVisitCounter()
+func HandlePatchHitCounter(w http.ResponseWriter, r *http.Request) {
+	data := service.IncrementHitCounter()
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(data)

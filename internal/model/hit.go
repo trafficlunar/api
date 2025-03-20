@@ -1,5 +1,5 @@
 package model
 
-type VisitCounter struct {
+type HitCounter struct {
 	Counter uint32 `json:"counter"`
 }
