@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"log/slog"
 	"net/http"
 	"os"
@@ -43,7 +44,11 @@ func NewRouter() {
 	}))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "https://trafficlunar.net", http.StatusPermanentRedirect)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{
+			"name": "trafficlunar's api",
+			"url":  "https://github.com/trafficlunar/api",
+		})
 	})
 
 	r.Get("/hit", handler.HandleGetHitCounter)

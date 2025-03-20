@@ -2,7 +2,7 @@
 
 ![written in go](https://github.com/intergrav/devins-badges/blob/v3/assets/cozy/built-with/go_64h.png?raw=true)
 
-trafficlunar's API
+trafficlunar's api
 
 ## features
 
