@@ -14,7 +14,6 @@ func StartLastFMWorker() {
 	LastFMData = service.GetLastFMData()
 
 	for range time.Tick(30 * time.Second) {
-		slog.Info("Requesting last.fm...")
 		LastFMData = service.GetLastFMData()
 	}
 }
