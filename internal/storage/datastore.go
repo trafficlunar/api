@@ -24,7 +24,9 @@ func InitDataStore() *DataStore {
 	file, err := os.Open("./data.json")
 	if err != nil {
 		if os.IsNotExist(err) {
-			slog.Warn("Data store file not found; creating new store")
+			slog.Warn("Data store file not found; creating new file")
+
+			GlobalDataStore.Save()
 			return GlobalDataStore
 		}
 		slog.Error("Could not load data store file!", slog.Any("error", err))
@@ -38,7 +40,7 @@ func InitDataStore() *DataStore {
 		return nil
 	}
 
-	slog.Info("Loaded data store")
+	slog.Info("Data store loaded")
 	return GlobalDataStore
 }
 
