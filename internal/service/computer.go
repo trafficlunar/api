@@ -2,22 +2,49 @@ package service
 
 import (
 	"api/internal/model"
+	"api/internal/storage"
 	"time"
 )
 
 var ComputerData model.ComputerData = model.ComputerData{
 	Online: false,
-	Graph:  initializeGraphData(),
+	Totals: model.ComputerTotals{
+		Keys:   0,
+		Clicks: 0,
+	},
+	Graph: initializeGraphData(),
+}
+
+func LoadComputerStatTotals() {
+	keysData := storage.GlobalDataStore.Get("keys")
+	clicksData := storage.GlobalDataStore.Get("clicks")
+
+	var keys float64
+	var clicks float64
+
+	if keysData != nil {
+		keys = keysData.(float64)
+	}
+	if clicksData != nil {
+		clicks = clicksData.(float64)
+	}
+
+	ComputerData.Totals = model.ComputerTotals{
+		Keys:   keys,
+		Clicks: clicks,
+	}
 }
 
 func initializeGraphData() []model.ComputerGraphData {
 	graphData := make([]model.ComputerGraphData, 60)
 
-	for i := 0; i < 60; i++ {
+	for i := range 60 {
 		graphData[i] = model.ComputerGraphData{
 			Timestamp: time.Now().Truncate(1 * time.Minute).Add(time.Duration(-60+i) * time.Minute),
 			Cpu:       0,
 			Ram:       0,
+			Keys:      0,
+			Clicks:    0,
 		}
 	}
 
@@ -29,6 +56,8 @@ func AddComputerData(clientMessage model.ComputerWebSocketMessage) {
 		Timestamp: time.Now().Truncate(time.Minute).Add(-time.Minute),
 		Cpu:       int(clientMessage.Cpu),
 		Ram:       int(clientMessage.Ram),
+		Keys:      int(clientMessage.Keys),
+		Clicks:    int(clientMessage.Clicks),
 	})
 
 	if len(ComputerData.Graph) > 60 {

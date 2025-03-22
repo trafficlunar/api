@@ -12,7 +12,9 @@ type DataStore struct {
 	Mutex sync.Mutex
 }
 
-var GlobalDataStore *DataStore
+var GlobalDataStore = &DataStore{
+	Data: make(map[string]any),
+}
 
 func InitDataStore() *DataStore {
 	GlobalDataStore = &DataStore{
@@ -36,6 +38,7 @@ func InitDataStore() *DataStore {
 		return nil
 	}
 
+	slog.Info("Loaded data store")
 	return GlobalDataStore
 }
 

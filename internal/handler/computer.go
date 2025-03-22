@@ -3,6 +3,7 @@ package handler
 import (
 	"api/internal/model"
 	"api/internal/service"
+	"api/internal/storage"
 	"api/internal/worker"
 	"encoding/json"
 	"log/slog"
@@ -33,7 +34,7 @@ func HandleComputerWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close()
 
-	slog.Info("WebSocket connection established!")
+	slog.Info("WebSocket connection established")
 	service.ComputerData.Online = true
 
 	for {
@@ -52,6 +53,25 @@ func HandleComputerWebSocket(w http.ResponseWriter, r *http.Request) {
 
 		worker.QueuedClientMessage = clientMessage
 		slog.Info("Recieved message", slog.Any("message", clientMessage))
+
+		// Add to totals
+		keysData := storage.GlobalDataStore.Get("keys")
+		clicksData := storage.GlobalDataStore.Get("clicks")
+
+		var keys float64
+		var clicks float64
+
+		if keysData != nil {
+			keys = keysData.(float64)
+		}
+		if clicksData != nil {
+			clicks = clicksData.(float64)
+		}
+
+		storage.GlobalDataStore.Set("keys", keys+float64(clientMessage.Keys))
+		storage.GlobalDataStore.Set("clicks", clicks+float64(clientMessage.Clicks))
+
+		service.LoadComputerStatTotals()
 	}
 }
 

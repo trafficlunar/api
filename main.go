@@ -4,12 +4,14 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"github.com/joho/godotenv"
 	"github.com/lmittmann/tint"
 
 	"api/internal/server"
+	"api/internal/service"
 	"api/internal/storage"
 	"api/internal/worker"
 )
@@ -20,10 +22,19 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		slog.Warn("No .env file was found; using environment variables.", slog.Any("error", err))
+		slog.Warn("No .env file was found; using environment variables", slog.Any("error", err))
 	}
 
-	storage.InitDataStore()
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+		storage.InitDataStore()
+	}()
+
+	wg.Wait()
+	service.LoadComputerStatTotals()
 	go worker.StartWorkers()
 
 	// Shutdown-chan~~

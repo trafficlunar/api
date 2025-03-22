@@ -18,8 +18,10 @@ func StartComputerWorker() {
 		if now.Second() == 0 {
 			if !service.ComputerData.Online {
 				service.AddComputerData(model.ComputerWebSocketMessage{
-					Cpu: 0,
-					Ram: 0,
+					Cpu:    0,
+					Ram:    0,
+					Keys:   0,
+					Clicks: 0,
 				})
 			} else {
 				service.AddComputerData(QueuedClientMessage)
