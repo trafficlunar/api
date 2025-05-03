@@ -16,7 +16,7 @@ import (
 )
 
 func getAllowedOrigins() []string {
-	allowedOrigins := []string{"https://trafficlunar.net"}
+	allowedOrigins := []string{"https://trafficlunar.net", "https://trafficlunar.nekoweb.org/"}
 
 	if os.Getenv("DEVELOPMENT_MODE") == "true" {
 		allowedOrigins = append(allowedOrigins, "http://localhost:4321")
