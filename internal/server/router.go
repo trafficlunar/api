@@ -54,6 +54,7 @@ func NewRouter() {
 	r.Get("/hit", handler.HandleGetHitCounter)
 	r.With(httprate.LimitByRealIP(1, time.Hour)).Patch("/hit", handler.HandlePatchHitCounter)
 	r.Get("/song", handler.HandleGetCurrentlyPlaying)
+	r.Get("/projects", handler.HandleGetProjects)
 	r.Get("/computer", handler.HandleComputerGraphData)
 	r.Get("/computer/ws", handler.HandleComputerWebSocket)
 
