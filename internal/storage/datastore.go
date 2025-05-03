@@ -21,7 +21,7 @@ func InitDataStore() *DataStore {
 		Data: make(map[string]any),
 	}
 
-	file, err := os.Open("./data.json")
+	file, err := os.Open("./data/data.json")
 	if err != nil {
 		if os.IsNotExist(err) {
 			slog.Warn("Data store file not found; creating new file")
@@ -60,7 +60,8 @@ func (store *DataStore) Save() error {
 	store.Mutex.Lock()
 	defer store.Mutex.Unlock()
 
-	file, err := os.Create("./data.json")
+	os.Mkdir("./data/", os.ModePerm)
+	file, err := os.Create("./data/data.json")
 	if err != nil {
 		slog.Error("Could not create data store file", slog.Any("error", err))
 		return err
