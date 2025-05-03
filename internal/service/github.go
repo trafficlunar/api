@@ -50,7 +50,8 @@ func GetGitHubData() []model.GitHubData {
 		}
 
 		data = append(data, model.GitHubData{
-			Name:        project,
+			Owner:       apiResponse.Owner.Login,
+			Name:        apiResponse.Name,
 			Description: apiResponse.Description,
 			Stars:       apiResponse.Stars,
 			Language:    apiResponse.Language,
