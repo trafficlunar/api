@@ -52,7 +52,7 @@ func GetGitHubData() []model.GitHubData {
 		data = append(data, model.GitHubData{
 			Name:        project,
 			Description: apiResponse.Description,
-			Stars:       fmt.Sprint(apiResponse.Stars),
+			Stars:       apiResponse.Stars,
 			Language:    apiResponse.Language,
 			Url:         apiResponse.Url,
 		})
