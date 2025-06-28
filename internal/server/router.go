@@ -57,6 +57,7 @@ func NewRouter() {
 	r.Get("/projects", handler.HandleGetProjects)
 	r.Get("/computer", handler.HandleComputerGraphData)
 	r.Get("/computer/ws", handler.HandleComputerWebSocket)
+	r.Get("/roblox/grow-a-robloxian/likes", handler.HandleGetGrowARobloxianLikesCount)
 
 	port := os.Getenv("PORT")
 	if len(port) == 0 {

@@ -5,4 +5,5 @@ func StartWorkers() {
 	go StartLastFMWorker()
 	go StartGitHubWorker()
 	go StartComputerWorker()
+	go StartRobloxWorker()
 }
