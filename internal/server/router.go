@@ -11,8 +11,10 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/go-chi/httprate"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"api/internal/handler"
+	app_middleware "api/internal/middleware"
 )
 
 func getAllowedOrigins() []string {
@@ -29,6 +31,7 @@ func NewRouter() {
 	r := chi.NewRouter()
 
 	// Middleware
+	r.Use(app_middleware.PrometheusMiddleware)
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
@@ -42,6 +45,9 @@ func NewRouter() {
 		AllowedHeaders: []string{"Content-Type"},
 		MaxAge:         300,
 	}))
+
+	// Prometheus
+	r.Handle("/metrics", promhttp.Handler())
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
