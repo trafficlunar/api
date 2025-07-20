@@ -31,7 +31,6 @@ func NewRouter() {
 	r := chi.NewRouter()
 
 	// Middleware
-	r.Use(app_middleware.PrometheusMiddleware)
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
@@ -46,24 +45,30 @@ func NewRouter() {
 		MaxAge:         300,
 	}))
 
-	// Prometheus
-	r.Handle("/metrics", promhttp.Handler())
+	// Add Prometheus middleware to all routes except WebSockets
+	r.Group(func(r chi.Router) {
+		r.Use(app_middleware.PrometheusMiddleware)
 
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{
-			"name": "trafficlunar's api",
-			"url":  "https://github.com/trafficlunar/api",
+		// Prometheus
+		r.Handle("/metrics", promhttp.Handler())
+
+		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]string{
+				"name": "trafficlunar's api",
+				"url":  "https://github.com/trafficlunar/api",
+			})
 		})
+
+		r.Get("/hit", handler.HandleGetHitCounter)
+		r.With(httprate.LimitByRealIP(1, time.Hour)).Patch("/hit", handler.HandlePatchHitCounter)
+		r.Get("/song", handler.HandleGetCurrentlyPlaying)
+		r.Get("/projects", handler.HandleGetProjects)
+		r.Get("/computer", handler.HandleComputerGraphData)
+		r.Get("/roblox/grow-a-robloxian/likes", handler.HandleGetGrowARobloxianLikesCount)
 	})
 
-	r.Get("/hit", handler.HandleGetHitCounter)
-	r.With(httprate.LimitByRealIP(1, time.Hour)).Patch("/hit", handler.HandlePatchHitCounter)
-	r.Get("/song", handler.HandleGetCurrentlyPlaying)
-	r.Get("/projects", handler.HandleGetProjects)
-	r.Get("/computer", handler.HandleComputerGraphData)
 	r.Get("/computer/ws", handler.HandleComputerWebSocket)
-	r.Get("/roblox/grow-a-robloxian/likes", handler.HandleGetGrowARobloxianLikesCount)
 
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
