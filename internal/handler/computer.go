@@ -9,6 +9,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -36,12 +37,14 @@ func HandleComputerWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	slog.Info("WebSocket connection established")
 	service.ComputerData.Online = true
+	service.ComputerData.UptimeStart = int(time.Now().Unix())
 
 	for {
 		_, message, err := conn.ReadMessage()
 		if err != nil {
 			slog.Error("WebSocket connection closed by client", slog.Any("error", err))
 			service.ComputerData.Online = false
+			service.ComputerData.UptimeStart = 0
 			break
 		}
 

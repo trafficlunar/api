@@ -10,9 +10,10 @@ type ComputerWebSocketMessage struct {
 }
 
 type ComputerData struct {
-	Online bool                `json:"online"`
-	Totals ComputerTotals      `json:"totals"`
-	Graph  []ComputerGraphData `json:"graph"`
+	Online      bool                `json:"online"`
+	UptimeStart int                 `json:"uptimeStart"`
+	Totals      ComputerTotals      `json:"totals"`
+	Graph       []ComputerGraphData `json:"graph"`
 }
 
 type ComputerTotals struct {

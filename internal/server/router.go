@@ -52,12 +52,17 @@ func NewRouter() {
 		// Prometheus
 		r.Handle("/metrics", promhttp.Handler())
 
+		var commit = "unknown"
+		if os.Getenv("SOURCE_COMMIT") != "" {
+			commit = os.Getenv("SOURCE_COMMIT")[:7] // shorten to 7 characters
+		}
+
 		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(map[string]string{
 				"name":   "trafficlunar's api",
 				"url":    "https://github.com/trafficlunar/api",
-				"commit": os.Getenv("SOURCE_COMMIT")[:7], // shorten to 7 characters
+				"commit": commit,
 			})
 		})
 		r.Get("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
