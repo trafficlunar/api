@@ -59,6 +59,9 @@ func NewRouter() {
 				"url":  "https://github.com/trafficlunar/api",
 			})
 		})
+		r.Get("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+			http.ServeFile(w, r, "./favicon.ico")
+		})
 
 		r.Get("/hit", handler.HandleGetHitCounter)
 		r.With(httprate.LimitByRealIP(1, time.Hour)).Patch("/hit", handler.HandlePatchHitCounter)

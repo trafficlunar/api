@@ -14,9 +14,8 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o api .
 FROM alpine:latest
 
 WORKDIR /app
-
 COPY --from=builder /app/api .
+COPY favicon.ico .
 
 EXPOSE 8888
-
 CMD [ "/app/api" ]
