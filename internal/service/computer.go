@@ -7,8 +7,10 @@ import (
 )
 
 var ComputerData model.ComputerData = model.ComputerData{
-	Online: false,
+	Online:      false,
+	UptimeStart: 0,
 	Totals: model.ComputerTotals{
+		Uptime: 0,
 		Keys:   0,
 		Clicks: 0,
 	},
@@ -16,12 +18,17 @@ var ComputerData model.ComputerData = model.ComputerData{
 }
 
 func LoadComputerStatTotals() {
+	uptimeData := storage.GlobalDataStore.Get("uptime")
 	keysData := storage.GlobalDataStore.Get("keys")
 	clicksData := storage.GlobalDataStore.Get("clicks")
 
+	var uptime float64
 	var keys float64
 	var clicks float64
 
+	if uptimeData != nil {
+		uptime = uptimeData.(float64)
+	}
 	if keysData != nil {
 		keys = keysData.(float64)
 	}
@@ -30,6 +37,7 @@ func LoadComputerStatTotals() {
 	}
 
 	ComputerData.Totals = model.ComputerTotals{
+		Uptime: uptime,
 		Keys:   keys,
 		Clicks: clicks,
 	}

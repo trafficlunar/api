@@ -17,6 +17,7 @@ type ComputerData struct {
 }
 
 type ComputerTotals struct {
+	Uptime float64 `json:"uptime"`
 	Keys   float64 `json:"keys"`
 	Clicks float64 `json:"clicks"`
 }

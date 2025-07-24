@@ -22,20 +22,24 @@ var upgrader = websocket.Upgrader{
 }
 
 func HandleComputerWebSocket(w http.ResponseWriter, r *http.Request) {
+	// Check if user is authorized
 	if r.Header.Get("Authorization") != os.Getenv("WEBSOCKET_PASSWORD") {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("Unauthorized"))
 		return
 	}
 
+	// Upgrade to WebSocket connection
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		slog.Error("Error when upgrading websocket connection", slog.Any("error", err))
+		slog.Error("Error when upgrading WebSocket connection", slog.Any("error", err))
 		return
 	}
 	defer conn.Close()
 
 	slog.Info("WebSocket connection established")
+
+	// Mark computer online and record the start time for uptime tracking
 	service.ComputerData.Online = true
 	service.ComputerData.UptimeStart = int(time.Now().Unix())
 
@@ -43,7 +47,23 @@ func HandleComputerWebSocket(w http.ResponseWriter, r *http.Request) {
 		_, message, err := conn.ReadMessage()
 		if err != nil {
 			slog.Error("WebSocket connection closed by client", slog.Any("error", err))
+
+			// Mark computer offline
 			service.ComputerData.Online = false
+
+			// Calculate uptime
+			sessionUptime := int(time.Now().Unix()) - service.ComputerData.UptimeStart
+
+			totalUptimeData := storage.GlobalDataStore.Get("uptime")
+			var totalUptime float64
+			if totalUptimeData != nil {
+				totalUptime = totalUptimeData.(float64)
+			}
+
+			// Add to totals
+			service.ComputerData.Totals.Uptime = totalUptime + float64(sessionUptime)
+			storage.GlobalDataStore.Set("uptime", service.ComputerData.Totals.Uptime)
+
 			service.ComputerData.UptimeStart = 0
 			break
 		}
@@ -64,6 +84,7 @@ func HandleComputerWebSocket(w http.ResponseWriter, r *http.Request) {
 		var keys float64
 		var clicks float64
 
+		// Convert values (if any) to float64
 		if keysData != nil {
 			keys = keysData.(float64)
 		}
@@ -71,6 +92,7 @@ func HandleComputerWebSocket(w http.ResponseWriter, r *http.Request) {
 			clicks = clicksData.(float64)
 		}
 
+		// Add counts from current message to the totals
 		storage.GlobalDataStore.Set("keys", keys+float64(clientMessage.Keys))
 		storage.GlobalDataStore.Set("clicks", clicks+float64(clientMessage.Clicks))
 
