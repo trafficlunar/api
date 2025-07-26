@@ -11,6 +11,7 @@ import (
 )
 
 func GetLastFMData() model.LastFMData {
+	// Fallback data
 	data := model.LastFMData{
 		Song:    "api error",
 		Artist:  "???",
@@ -19,6 +20,7 @@ func GetLastFMData() model.LastFMData {
 		Playing: false,
 	}
 
+	// Send request to URL
 	url := fmt.Sprintf("http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=%s&api_key=%s&format=json&limit=1", os.Getenv("LASTFM_USERNAME"), os.Getenv("LASTFM_API_KEY"))
 	res, err := http.Get(url)
 	if err != nil {
@@ -26,22 +28,30 @@ func GetLastFMData() model.LastFMData {
 		return data
 	}
 
+	// Read response
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		slog.Error("Error reading body", slog.Any("error", err))
 		return data
 	}
 
+	// Unmarshal JSON into model
 	var lastfmJSON model.LastFMAPI
-
 	err = json.Unmarshal(body, &lastfmJSON)
 	if err != nil {
 		slog.Error("Error unmarshalling JSON", slog.Any("error", err))
 		return data
 	}
 
+	// Check that the track list isn't nil
+	if lastfmJSON.RecentTracks.TrackList == nil {
+		slog.Warn("No recent tracks returned from last.fm API")
+		return data
+	}
+
 	lastfmData := lastfmJSON.RecentTracks.TrackList[0]
 
+	// Check if track is playing
 	if lastfmData.Attributes != nil {
 		data.Playing = true
 	}
