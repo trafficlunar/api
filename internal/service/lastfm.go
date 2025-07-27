@@ -43,7 +43,6 @@ func GetLastFMData() model.LastFMData {
 		return data
 	}
 
-	// Check that the track list isn't nil
 	if lastfmJSON.RecentTracks.TrackList == nil {
 		slog.Warn("No recent tracks returned from last.fm API")
 		return data
@@ -51,7 +50,6 @@ func GetLastFMData() model.LastFMData {
 
 	lastfmData := lastfmJSON.RecentTracks.TrackList[0]
 
-	// Check if track is playing
 	if lastfmData.Attributes != nil {
 		data.Playing = true
 	}

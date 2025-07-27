@@ -25,10 +25,14 @@ func GetRobloxGrowARobloxianLikesCount() int {
 	}
 
 	var apiData model.RobloxGameVotesAPI
-
 	err = json.Unmarshal(body, &apiData)
 	if err != nil {
 		slog.Error("Error unmarshalling JSON", slog.Any("error", err))
+		return 0
+	}
+
+	if apiData.Data == nil {
+		slog.Warn("No data returned from Roblox votes API")
 		return 0
 	}
 
