@@ -39,6 +39,16 @@ func HandleComputerWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	slog.Info("WebSocket connection established")
 
+	// Respond to client pings
+	conn.SetPingHandler(func(appData string) error {
+		slog.Info("Recieved ping from client")
+		return conn.WriteControl(
+			websocket.PongMessage,
+			[]byte(appData),                // echo back the same data
+			time.Now().Add(10*time.Second), // deadline
+		)
+	})
+
 	// Mark computer online and record the start time for uptime tracking
 	service.ComputerData.Online = true
 	service.ComputerData.UptimeStart = int(time.Now().Unix())
