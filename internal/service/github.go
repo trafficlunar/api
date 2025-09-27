@@ -42,7 +42,7 @@ func GetGitHubData() []model.GitHubData {
 			continue
 		}
 
-		var apiResponse model.GitHubAPI
+		var apiResponse model.GitHubData
 		err = json.Unmarshal(body, &apiResponse)
 		if err != nil {
 			slog.Error("Error unmarshalling JSON", slog.Any("error", err))
@@ -50,12 +50,9 @@ func GetGitHubData() []model.GitHubData {
 		}
 
 		data = append(data, model.GitHubData{
-			Owner:       apiResponse.Owner.Login,
-			Name:        apiResponse.Name,
-			Description: apiResponse.Description,
-			Stars:       apiResponse.Stars,
-			Language:    apiResponse.Language,
-			Url:         apiResponse.Url,
+			Name:     apiResponse.Name,
+			Stars:    apiResponse.Stars,
+			Language: apiResponse.Language,
 		})
 	}
 
