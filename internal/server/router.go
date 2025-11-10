@@ -74,7 +74,6 @@ func NewRouter() {
 		r.Get("/song", handler.HandleGetCurrentlyPlaying)
 		r.Get("/projects", handler.HandleGetProjects)
 		r.Get("/computer", handler.HandleComputerGraphData)
-		r.Get("/roblox/grow-a-robloxian/likes", handler.HandleGetGrowARobloxianLikesCount)
 	})
 
 	r.Get("/computer/ws", handler.HandleComputerWebSocket)
