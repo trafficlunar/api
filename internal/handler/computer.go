@@ -49,6 +49,8 @@ func HandleComputerWebSocket(w http.ResponseWriter, r *http.Request) {
 		)
 	})
 
+	service.LoadComputerStatTotals()
+
 	// Mark computer online and record the start time for uptime tracking
 	service.ComputerData.Online = true
 	service.ComputerData.UptimeStart = int(time.Now().Unix())
@@ -64,6 +66,7 @@ func HandleComputerWebSocket(w http.ResponseWriter, r *http.Request) {
 			// Calculate uptime
 			sessionUptime := int(time.Now().Unix()) - service.ComputerData.UptimeStart
 
+			// Get current total uptime from data store
 			totalUptimeData := storage.GlobalDataStore.Get("uptime")
 			var totalUptime float64
 			if totalUptimeData != nil {
@@ -74,6 +77,7 @@ func HandleComputerWebSocket(w http.ResponseWriter, r *http.Request) {
 			service.ComputerData.Totals.Uptime = totalUptime + float64(sessionUptime)
 			storage.GlobalDataStore.Set("uptime", service.ComputerData.Totals.Uptime)
 
+			// Reset uptime start (computer is offline)
 			service.ComputerData.UptimeStart = 0
 			break
 		}
