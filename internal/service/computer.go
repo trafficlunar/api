@@ -8,7 +8,7 @@ import (
 
 var ComputerData model.ComputerData = model.ComputerData{
 	Online:      false,
-	UptimeStart: 0,
+	UptimeStart: -1,
 	Totals: model.ComputerTotals{
 		Uptime: 0,
 		Keys:   0,
