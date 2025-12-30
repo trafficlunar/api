@@ -9,11 +9,16 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
 )
 
+// If computer disconnected and reconnected within 45 seconds,
+// continue current session (keep uptime at the same value)
+var lastSeen time.Time
+var computerDataMutex sync.RWMutex
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		// todo: change for security
@@ -49,18 +54,25 @@ func HandleComputerWebSocket(w http.ResponseWriter, r *http.Request) {
 		)
 	})
 
+	computerDataMutex.Lock()
 	service.LoadComputerStatTotals()
 
-	// Mark computer online and record the start time for uptime tracking
 	service.ComputerData.Online = true
-	service.ComputerData.UptimeStart = int(time.Now().Unix())
+
+	// If computer has not been seen in the last 45s, start new session
+	if time.Since(lastSeen) > 45*time.Second {
+		service.ComputerData.UptimeStart = int(time.Now().Unix())
+	} else {
+		slog.Info("Continuing existing uptime session")
+	}
+	computerDataMutex.Unlock()
 
 	for {
 		_, message, err := conn.ReadMessage()
 		if err != nil {
-			slog.Error("WebSocket connection closed by client", slog.Any("error", err))
+			slog.Error("WebSocket connection closed", slog.Any("error", err))
 
-			// Mark computer offline
+			computerDataMutex.Lock()
 			service.ComputerData.Online = false
 
 			// Calculate uptime only if we have a valid start time
@@ -79,9 +91,19 @@ func HandleComputerWebSocket(w http.ResponseWriter, r *http.Request) {
 				service.ComputerData.Totals.Uptime = totalUptime + float64(sessionUptime)
 				storage.GlobalDataStore.Set("uptime", service.ComputerData.Totals.Uptime)
 			}
+			computerDataMutex.Unlock()
 
-			// Set uptime start to -1 (computer is offline)
-			service.ComputerData.UptimeStart = -1
+			// Check after 45s that computer is still offline, if so set to -1 (computer is offline)
+			time.AfterFunc(45*time.Second, func() {
+				computerDataMutex.Lock()
+				defer computerDataMutex.Unlock()
+
+				if !service.ComputerData.Online {
+					service.ComputerData.UptimeStart = -1
+				}
+			})
+
+			lastSeen = time.Now()
 			break
 		}
 
@@ -92,7 +114,7 @@ func HandleComputerWebSocket(w http.ResponseWriter, r *http.Request) {
 		}
 
 		worker.QueuedClientMessage = clientMessage
-		slog.Info("Recieved message", slog.Any("message", clientMessage))
+		slog.Info("Received message", slog.Any("message", clientMessage))
 
 		// Add to totals
 		keysData := storage.GlobalDataStore.Get("keys")
@@ -109,7 +131,6 @@ func HandleComputerWebSocket(w http.ResponseWriter, r *http.Request) {
 			clicks = clicksData.(float64)
 		}
 
-		// Add counts from current message to the totals
 		storage.GlobalDataStore.Set("keys", keys+float64(clientMessage.Keys))
 		storage.GlobalDataStore.Set("clicks", clicks+float64(clientMessage.Clicks))
 
@@ -119,5 +140,9 @@ func HandleComputerWebSocket(w http.ResponseWriter, r *http.Request) {
 
 func HandleComputerGraphData(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+
+	computerDataMutex.RLock()
+	defer computerDataMutex.RUnlock()
+
 	json.NewEncoder(w).Encode(service.ComputerData)
 }
