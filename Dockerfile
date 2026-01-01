@@ -18,4 +18,5 @@ COPY --from=builder /app/api .
 COPY favicon.ico .
 
 EXPOSE 8888
+EXPOSE 8889
 CMD [ "/app/api" ]

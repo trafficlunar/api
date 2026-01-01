@@ -38,6 +38,7 @@ func main() {
 	go worker.StartWorkers()
 
 	// Shutdown-chan~~
+	// this joke sucks
 	shutdownChan := make(chan os.Signal, 1)
 	signal.Notify(shutdownChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
@@ -53,5 +54,6 @@ func main() {
 		os.Exit(0)
 	}()
 
+	server.StartPrometheusServer()
 	server.NewRouter()
 }

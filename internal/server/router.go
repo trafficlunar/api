@@ -11,7 +11,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/go-chi/httprate"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"api/internal/handler"
 	app_middleware "api/internal/middleware"
@@ -48,9 +47,6 @@ func NewRouter() {
 	// Add Prometheus middleware to all routes except WebSockets
 	r.Group(func(r chi.Router) {
 		r.Use(app_middleware.PrometheusMiddleware)
-
-		// Prometheus
-		r.Handle("/metrics", promhttp.Handler())
 
 		var commit = "unknown"
 		if os.Getenv("SOURCE_COMMIT") != "" {
